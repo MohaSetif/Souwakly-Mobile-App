@@ -3,7 +3,7 @@
 import { Platform } from "react-native";
 
 // Configure your Laravel API base URL here
-const API_BASE_URL = 'http://172.17.193.116:8000/api';
+const API_BASE_URL = 'http://172.17.194.71:8000/api';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
