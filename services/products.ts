@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query"
 import { apiClient } from "./apiClient"
 
 export const getProducts = async () => {
@@ -18,4 +19,12 @@ export const updateProduct = async (id: string, product: any) => {
 export const deleteProduct = async (id: string) => {
     const response = await apiClient.delete(`products/${id}`)
     return response.data
+}
+
+
+export const useProducts = () => {
+    return useQuery({
+        queryKey: ["products"],
+        queryFn: getProducts
+    })
 }
