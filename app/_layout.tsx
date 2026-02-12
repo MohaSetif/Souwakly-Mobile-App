@@ -9,9 +9,20 @@ import { AuthProvider } from '@/context/auth-context';
 import { useAuth } from '@/hooks/use-auth';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 export const unstable_settings = {
   anchor: '(tabs)',
 };
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 1000 * 60 * 5,
+    },
+  },
+});
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
@@ -56,9 +67,11 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <RootLayoutNav />
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <RootLayoutNav />
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
