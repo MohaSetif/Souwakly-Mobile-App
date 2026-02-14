@@ -5,12 +5,15 @@ import {
     ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
+    Pressable,
     ScrollView,
     StyleSheet,
     TextInput,
     TouchableOpacity,
     View,
 } from 'react-native';
+
+import { IconSymbol } from '@/components/ui/icon-symbol';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -25,6 +28,7 @@ export default function LoginScreen() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
@@ -122,23 +126,36 @@ export default function LoginScreen() {
                         {/* Password Input */}
                         <View style={styles.inputGroup}>
                             <ThemedText style={styles.label}>Password</ThemedText>
-                            <TextInput
-                                style={[
-                                    styles.input,
-                                    {
-                                        color: colors.text,
-                                        borderColor: fieldErrors.password ? '#ef4444' : colors.icon,
-                                        backgroundColor: colorScheme === 'dark' ? '#1f2937' : '#f9fafb',
-                                    },
-                                ]}
-                                placeholder="Enter your password"
-                                placeholderTextColor={colors.icon}
-                                value={password}
-                                onChangeText={setPassword}
-                                secureTextEntry
-                                autoComplete="password"
-                                editable={!isLoading}
-                            />
+                            <View style={styles.passwordContainer}>
+                                <TextInput
+                                    style={[
+                                        styles.input,
+                                        styles.passwordInput,
+                                        {
+                                            color: colors.text,
+                                            borderColor: fieldErrors.password ? '#ef4444' : colors.icon,
+                                            backgroundColor: colorScheme === 'dark' ? '#1f2937' : '#f9fafb',
+                                        },
+                                    ]}
+                                    placeholder="Enter your password"
+                                    placeholderTextColor={colors.icon}
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    secureTextEntry={!showPassword}
+                                    autoComplete="password"
+                                    editable={!isLoading}
+                                />
+                                <Pressable
+                                    onPress={() => setShowPassword(!showPassword)}
+                                    style={styles.eyeIcon}
+                                >
+                                    <IconSymbol
+                                        name={showPassword ? 'eye.slash' : 'eye'}
+                                        size={24}
+                                        color={colors.icon}
+                                    />
+                                </Pressable>
+                            </View>
                             {fieldErrors.password && (
                                 <ThemedText style={styles.fieldError}>
                                     {fieldErrors.password[0]}
@@ -230,6 +247,18 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 16,
         fontSize: 16,
+    },
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    passwordInput: {
+        flex: 1,
+        paddingRight: 50,
+    },
+    eyeIcon: {
+        position: 'absolute',
+        right: 16,
     },
     fieldError: {
         color: '#ef4444',

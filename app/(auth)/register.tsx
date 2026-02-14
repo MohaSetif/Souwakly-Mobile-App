@@ -5,12 +5,15 @@ import {
     ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
+    Pressable,
     ScrollView,
     StyleSheet,
     TextInput,
     TouchableOpacity,
     View,
 } from 'react-native';
+
+import { IconSymbol } from '@/components/ui/icon-symbol';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -27,6 +30,8 @@ export default function RegisterScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
@@ -169,23 +174,36 @@ export default function RegisterScreen() {
                         {/* Password Input */}
                         <View style={styles.inputGroup}>
                             <ThemedText style={styles.label}>Password</ThemedText>
-                            <TextInput
-                                style={[
-                                    styles.input,
-                                    {
-                                        color: colors.text,
-                                        borderColor: fieldErrors.password ? '#ef4444' : colors.icon,
-                                        backgroundColor: colorScheme === 'dark' ? '#1f2937' : '#f9fafb',
-                                    },
-                                ]}
-                                placeholder="Create a password"
-                                placeholderTextColor={colors.icon}
-                                value={password}
-                                onChangeText={setPassword}
-                                secureTextEntry
-                                autoComplete="password-new"
-                                editable={!isLoading}
-                            />
+                            <View style={styles.passwordContainer}>
+                                <TextInput
+                                    style={[
+                                        styles.input,
+                                        styles.passwordInput,
+                                        {
+                                            color: colors.text,
+                                            borderColor: fieldErrors.password ? '#ef4444' : colors.icon,
+                                            backgroundColor: colorScheme === 'dark' ? '#1f2937' : '#f9fafb',
+                                        },
+                                    ]}
+                                    placeholder="Create a password"
+                                    placeholderTextColor={colors.icon}
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    secureTextEntry={!showPassword}
+                                    autoComplete="password-new"
+                                    editable={!isLoading}
+                                />
+                                <Pressable
+                                    onPress={() => setShowPassword(!showPassword)}
+                                    style={styles.eyeIcon}
+                                >
+                                    <IconSymbol
+                                        name={showPassword ? 'eye.slash' : 'eye'}
+                                        size={24}
+                                        color={colors.icon}
+                                    />
+                                </Pressable>
+                            </View>
                             {fieldErrors.password && (
                                 <ThemedText style={styles.fieldError}>
                                     {fieldErrors.password[0]}
@@ -196,23 +214,36 @@ export default function RegisterScreen() {
                         {/* Confirm Password Input */}
                         <View style={styles.inputGroup}>
                             <ThemedText style={styles.label}>Confirm Password</ThemedText>
-                            <TextInput
-                                style={[
-                                    styles.input,
-                                    {
-                                        color: colors.text,
-                                        borderColor: fieldErrors.password_confirmation ? '#ef4444' : colors.icon,
-                                        backgroundColor: colorScheme === 'dark' ? '#1f2937' : '#f9fafb',
-                                    },
-                                ]}
-                                placeholder="Confirm your password"
-                                placeholderTextColor={colors.icon}
-                                value={passwordConfirmation}
-                                onChangeText={setPasswordConfirmation}
-                                secureTextEntry
-                                autoComplete="password-new"
-                                editable={!isLoading}
-                            />
+                            <View style={styles.passwordContainer}>
+                                <TextInput
+                                    style={[
+                                        styles.input,
+                                        styles.passwordInput,
+                                        {
+                                            color: colors.text,
+                                            borderColor: fieldErrors.password_confirmation ? '#ef4444' : colors.icon,
+                                            backgroundColor: colorScheme === 'dark' ? '#1f2937' : '#f9fafb',
+                                        },
+                                    ]}
+                                    placeholder="Confirm your password"
+                                    placeholderTextColor={colors.icon}
+                                    value={passwordConfirmation}
+                                    onChangeText={setPasswordConfirmation}
+                                    secureTextEntry={!showPasswordConfirmation}
+                                    autoComplete="password-new"
+                                    editable={!isLoading}
+                                />
+                                <Pressable
+                                    onPress={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
+                                    style={styles.eyeIcon}
+                                >
+                                    <IconSymbol
+                                        name={showPasswordConfirmation ? 'eye.slash' : 'eye'}
+                                        size={24}
+                                        color={colors.icon}
+                                    />
+                                </Pressable>
+                            </View>
                             {fieldErrors.password_confirmation && (
                                 <ThemedText style={styles.fieldError}>
                                     {fieldErrors.password_confirmation[0]}
@@ -304,6 +335,18 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 16,
         fontSize: 16,
+    },
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    passwordInput: {
+        flex: 1,
+        paddingRight: 50,
+    },
+    eyeIcon: {
+        position: 'absolute',
+        right: 16,
     },
     fieldError: {
         color: '#ef4444',
