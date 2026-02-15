@@ -1,4 +1,4 @@
-const LOCAL_IP = "172.17.193.38";
+const LOCAL_IP = "172.17.193.33";
 const PORT = "8000";
 
 const getBaseServerUrl = () => {
