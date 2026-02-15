@@ -1,17 +1,20 @@
-import { Image } from 'expo-image';
-import { useState } from 'react';
-import { ActivityIndicator, Platform, StyleSheet, TouchableOpacity } from 'react-native';
-
 import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Colors, GoldColors } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
-import { Link } from 'expo-router';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useState } from 'react';
+import { ActivityIndicator, Dimensions, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+
+const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const { user, logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const colorScheme = useColorScheme() ?? 'light';
+  const colors = Colors[colorScheme];
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -23,121 +26,252 @@ export default function HomeScreen() {
   };
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome{user?.name ? `, ${user.name}` : ''}!</ThemedText>
-        <HelloWave />
-      </ThemedView>
+    <ThemedView style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.heroSection}>
+          <View style={styles.heroLine} />
+          <ThemedText style={styles.heroLabel}>MEMBER SINCE {new Date().getFullYear()}</ThemedText>
+          <ThemedText style={styles.heroName}>{user?.name?.toUpperCase() || 'EXECUTIVE'}</ThemedText>
+          <View style={styles.heroSubRow}>
+            <ThemedText style={styles.heroStatus}>VERIFIED PARTNER</ThemedText>
+            <HelloWave />
+          </View>
+        </View>
 
-      {/* Logout Button */}
-      <ThemedView style={styles.logoutContainer}>
+        <View style={styles.mainGrid}>
+          <View style={styles.statsPanel}>
+            <View style={styles.statItem}>
+              <ThemedText style={styles.statLabel}>NET WORTH</ThemedText>
+              <ThemedText style={styles.statValue}>$1.2M</ThemedText>
+              <View style={styles.trendRow}>
+                <IconSymbol name="arrow.up.right" size={12} color="#4ade80" />
+                <ThemedText style={styles.trendText}>+12.5%</ThemedText>
+              </View>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <ThemedText style={styles.statLabel}>NETWORK</ThemedText>
+              <ThemedText style={styles.statValue}>48 k</ThemedText>
+              <ThemedText style={styles.trendText}>ACTIVE NODES</ThemedText>
+            </View>
+          </View>
+
+          <View style={styles.featuredCard}>
+            <View style={styles.featuredContent}>
+              <ThemedText style={styles.featuredTag}>PRIORITY</ThemedText>
+              <ThemedText style={styles.featuredTitle}>Expand Global Reach</ThemedText>
+              <ThemedText style={styles.featuredDesc}>Invite 10 new strategic partners to unlock the Platinum tier.</ThemedText>
+            </View>
+            <TouchableOpacity style={styles.featuredAction}>
+              <IconSymbol name="arrow.right" size={20} color="#000" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.actionsList}>
+            <ThemedText style={styles.sectionLabel}>CAPABILITIES</ThemedText>
+            <TouchableOpacity style={styles.actionItem} activeOpacity={0.7}>
+              <View style={styles.actionIcon}>
+                <IconSymbol name="plus" size={20} color={GoldColors.primary} />
+              </View>
+              <ThemedText style={styles.actionLabel}>DEPLOY NEW ASSET</ThemedText>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionItem} activeOpacity={0.7}>
+              <View style={styles.actionIcon}>
+                <IconSymbol name="link" size={20} color={GoldColors.primary} />
+              </View>
+              <ThemedText style={styles.actionLabel}>GENERATE ACCESS LINK</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         <TouchableOpacity
-          style={styles.logoutButton}
+          style={styles.logoutLink}
           onPress={handleLogout}
           disabled={isLoggingOut}
-          activeOpacity={0.8}
+          activeOpacity={0.7}
         >
-          {isLoggingOut ? (
-            <ActivityIndicator color="#fff" size="small" />
-          ) : (
-            <ThemedText style={styles.logoutButtonText}>Logout</ThemedText>
-          )}
+          <ThemedText style={styles.logoutText}>TERMINATE SESSION</ThemedText>
+          {isLoggingOut && <ActivityIndicator size="small" color="#ff6b6b" style={{ marginLeft: 10 }} />}
         </TouchableOpacity>
-      </ThemedView>
-
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  scrollContent: {
+    paddingTop: 80,
+    paddingBottom: 120,
+    paddingHorizontal: 30,
+  },
+  heroSection: {
+    marginBottom: 60,
+  },
+  heroLine: {
+    width: 2,
+    height: 40,
+    backgroundColor: GoldColors.primary,
+    marginBottom: 20,
+  },
+  heroLabel: {
+    fontSize: 10,
+    letterSpacing: 3,
+    color: 'rgba(255, 255, 255, 0.4)',
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  heroName: {
+    fontSize: 48,
+    fontWeight: '300',
+    color: '#fff',
+    letterSpacing: -1,
+    lineHeight: 52,
+  },
+  heroSubRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 15,
+    gap: 15,
+  },
+  heroStatus: {
+    fontSize: 12,
+    color: GoldColors.primary,
+    letterSpacing: 2,
+    fontWeight: '800',
+  },
+  mainGrid: {
+    gap: 40,
+  },
+  statsPanel: {
+    flexDirection: 'row',
+    backgroundColor: '#0A0A0A',
+    borderRadius: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.05)',
+    padding: 30,
+    justifyContent: 'space-between',
+  },
+  statItem: {
+    flex: 1,
     gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  statDivider: {
+    width: 1,
+    height: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    marginHorizontal: 20,
   },
-  logoutContainer: {
-    marginBottom: 16,
+  statLabel: {
+    fontSize: 9,
+    letterSpacing: 2,
+    color: 'rgba(255, 255, 255, 0.3)',
+    fontWeight: '800',
   },
-  logoutButton: {
-    backgroundColor: '#ef4444',
-    borderRadius: 12,
-    padding: 14,
+  statValue: {
+    fontSize: 28,
+    fontWeight: '300',
+    color: GoldColors.primary,
+  },
+  trendRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
   },
-  logoutButtonText: {
-    color: '#fff',
-    fontSize: 14,
+  trendText: {
+    fontSize: 10,
+    color: 'rgba(255, 255, 255, 0.4)',
     fontWeight: '600',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  featuredCard: {
+    backgroundColor: GoldColors.secondary,
+    padding: 30,
+    borderRadius: 2,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    shadowColor: GoldColors.secondary,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+  },
+  featuredContent: {
+    flex: 1,
+    gap: 12,
+  },
+  featuredTag: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: '#000',
+    letterSpacing: 2,
+    opacity: 0.6,
+  },
+  featuredTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#000',
+  },
+  featuredDesc: {
+    fontSize: 13,
+    color: 'rgba(0, 0, 0, 0.6)',
+    lineHeight: 18,
+  },
+  featuredAction: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  actionsList: {
+    gap: 20,
+  },
+  sectionLabel: {
+    fontSize: 10,
+    letterSpacing: 3,
+    color: 'rgba(255, 255, 255, 0.2)',
+    fontWeight: '800',
+  },
+  actionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    paddingVertical: 15,
+  },
+  actionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#0A0A0A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.1)',
+  },
+  actionLabel: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 1,
+  },
+  logoutLink: {
+    marginTop: 60,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoutText: {
+    fontSize: 11,
+    letterSpacing: 2,
+    color: '#ff6b6b',
+    fontWeight: '800',
   },
 });

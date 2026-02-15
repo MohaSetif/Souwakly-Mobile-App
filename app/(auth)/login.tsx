@@ -13,53 +13,39 @@ import {
     View,
 } from 'react-native';
 
-import { IconSymbol } from '@/components/ui/icon-symbol';
-
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Colors } from '@/constants/theme';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { Colors, GoldColors } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function LoginScreen() {
     const { login } = useAuth();
-    const colorScheme = useColorScheme();
-    const colors = Colors[colorScheme ?? 'light'];
+    const colorScheme = useColorScheme() ?? 'light';
+    const colors = Colors[colorScheme];
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
     const handleLogin = async () => {
-        // Reset errors
-        setError(null);
-        setFieldErrors({});
-
-        // Basic validation
-        if (!email.trim()) {
-            setFieldErrors({ email: ['Email is required'] });
-            return;
-        }
-        if (!password) {
-            setFieldErrors({ password: ['Password is required'] });
+        if (!email || !password) {
+            setError('Please fill in all fields');
             return;
         }
 
         setIsLoading(true);
+        setError(null);
         try {
             const result = await login(email.trim(), password);
-
             if (!result.success) {
-                if (result.errors) {
-                    setFieldErrors(result.errors);
-                }
                 setError(result.message || 'Login failed');
             }
-            // Don't manually redirect - the useEffect in _layout.tsx will handle it
-            // when isAuthenticated becomes true
+        } catch (err: any) {
+            setError('An unexpected error occurred');
         } finally {
             setIsLoading(false);
         }
@@ -67,7 +53,8 @@ export default function LoginScreen() {
 
     return (
         <ThemedView style={styles.container}>
-            <StatusBar style="auto" />
+            <StatusBar style="light" />
+
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.keyboardView}
@@ -76,73 +63,47 @@ export default function LoginScreen() {
                     contentContainerStyle={styles.scrollContent}
                     keyboardShouldPersistTaps="handled"
                 >
-                    {/* Header */}
-                    <View style={styles.header}>
-                        <ThemedText type="title" style={styles.title}>
-                            Welcome Back
-                        </ThemedText>
-                        <ThemedText style={styles.subtitle}>
-                            Sign in to continue
-                        </ThemedText>
+                    <View style={styles.topDecoration}>
+                        <View style={styles.glow} />
                     </View>
 
-                    {/* Form */}
+                    <View style={styles.header}>
+                        <ThemedText style={styles.brandTitle}>SOUWAKLY</ThemedText>
+                        <View style={styles.rule} />
+                        <ThemedText style={styles.brandSubtitle}>EXECUTIVE PLATFORM</ThemedText>
+                    </View>
+
                     <View style={styles.form}>
-                        {/* General Error */}
                         {error && (
                             <View style={styles.errorContainer}>
                                 <ThemedText style={styles.errorText}>{error}</ThemedText>
                             </View>
                         )}
 
-                        {/* Email Input */}
                         <View style={styles.inputGroup}>
-                            <ThemedText style={styles.label}>Email</ThemedText>
+                            <ThemedText style={styles.label}>IDENTIFIER</ThemedText>
                             <TextInput
-                                style={[
-                                    styles.input,
-                                    {
-                                        color: colors.text,
-                                        borderColor: fieldErrors.email ? '#ef4444' : colors.icon,
-                                        backgroundColor: colorScheme === 'dark' ? '#1f2937' : '#f9fafb',
-                                    },
-                                ]}
-                                placeholder="Enter your email"
-                                placeholderTextColor={colors.icon}
+                                style={styles.input}
+                                placeholder="ACCESS KEY (EMAIL)"
+                                placeholderTextColor="rgba(255, 255, 255, 0.2)"
                                 value={email}
                                 onChangeText={setEmail}
                                 autoCapitalize="none"
                                 keyboardType="email-address"
-                                autoComplete="email"
                                 editable={!isLoading}
                             />
-                            {fieldErrors.email && (
-                                <ThemedText style={styles.fieldError}>
-                                    {fieldErrors.email[0]}
-                                </ThemedText>
-                            )}
                         </View>
 
-                        {/* Password Input */}
                         <View style={styles.inputGroup}>
-                            <ThemedText style={styles.label}>Password</ThemedText>
+                            <ThemedText style={styles.label}>SECURITY PHRASE</ThemedText>
                             <View style={styles.passwordContainer}>
                                 <TextInput
-                                    style={[
-                                        styles.input,
-                                        styles.passwordInput,
-                                        {
-                                            color: colors.text,
-                                            borderColor: fieldErrors.password ? '#ef4444' : colors.icon,
-                                            backgroundColor: colorScheme === 'dark' ? '#1f2937' : '#f9fafb',
-                                        },
-                                    ]}
-                                    placeholder="Enter your password"
-                                    placeholderTextColor={colors.icon}
+                                    style={[styles.input, { flex: 1 }]}
+                                    placeholder="••••••••"
+                                    placeholderTextColor="rgba(255, 255, 255, 0.2)"
                                     value={password}
                                     onChangeText={setPassword}
                                     secureTextEntry={!showPassword}
-                                    autoComplete="password"
                                     editable={!isLoading}
                                 />
                                 <Pressable
@@ -151,42 +112,31 @@ export default function LoginScreen() {
                                 >
                                     <IconSymbol
                                         name={showPassword ? 'eye.slash' : 'eye'}
-                                        size={24}
-                                        color={colors.icon}
+                                        size={18}
+                                        color={GoldColors.primary}
                                     />
                                 </Pressable>
                             </View>
-                            {fieldErrors.password && (
-                                <ThemedText style={styles.fieldError}>
-                                    {fieldErrors.password[0]}
-                                </ThemedText>
-                            )}
                         </View>
 
-                        {/* Login Button */}
                         <TouchableOpacity
                             style={[styles.button, isLoading && styles.buttonDisabled]}
                             onPress={handleLogin}
                             disabled={isLoading}
-                            activeOpacity={0.8}
+                            activeOpacity={0.7}
                         >
                             {isLoading ? (
-                                <ActivityIndicator color="#fff" />
+                                <ActivityIndicator color="#000" />
                             ) : (
-                                <ThemedText style={styles.buttonText}>Sign In</ThemedText>
+                                <ThemedText style={styles.buttonText}>AUTHORIZE ACCESS</ThemedText>
                             )}
                         </TouchableOpacity>
 
-                        {/* Register Link */}
                         <View style={styles.footer}>
-                            <ThemedText style={styles.footerText}>
-                                Don't have an account?{' '}
-                            </ThemedText>
+                            <ThemedText style={styles.footerText}>NEW RECRUIT? </ThemedText>
                             <Link href="/(auth)/register" asChild>
                                 <TouchableOpacity>
-                                    <ThemedText style={[styles.linkText, { color: colors.tint }]}>
-                                        Create one
-                                    </ThemedText>
+                                    <ThemedText style={styles.linkText}>CREATE CREDENTIALS</ThemedText>
                                 </TouchableOpacity>
                             </Link>
                         </View>
@@ -200,6 +150,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#000',
     },
     keyboardView: {
         flex: 1,
@@ -207,87 +158,122 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         justifyContent: 'center',
-        padding: 24,
+        padding: 40,
+    },
+    topDecoration: {
+        position: 'absolute',
+        top: -100,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+    },
+    glow: {
+        width: 300,
+        height: 300,
+        borderRadius: 150,
+        backgroundColor: GoldColors.secondary,
+        opacity: 0.1,
+        transform: [{ scaleY: 0.5 }],
     },
     header: {
-        marginBottom: 40,
+        alignItems: 'center',
+        marginBottom: 60,
     },
-    title: {
+    brandTitle: {
         fontSize: 32,
-        fontWeight: 'bold',
-        marginBottom: 8,
+        fontWeight: '300',
+        color: GoldColors.primary,
+        letterSpacing: 8,
+        textTransform: 'uppercase',
     },
-    subtitle: {
-        fontSize: 16,
-        opacity: 0.7,
+    rule: {
+        width: 40,
+        height: 1,
+        backgroundColor: GoldColors.secondary,
+        marginVertical: 15,
     },
-    form: {
-        gap: 20,
-    },
-    errorContainer: {
-        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-        borderRadius: 12,
-        padding: 16,
-        borderWidth: 1,
-        borderColor: 'rgba(239, 68, 68, 0.3)',
-    },
-    errorText: {
-        color: '#ef4444',
-        textAlign: 'center',
-    },
-    inputGroup: {
-        gap: 8,
-    },
-    label: {
-        fontSize: 14,
+    brandSubtitle: {
+        fontSize: 10,
+        color: 'rgba(255, 255, 255, 0.4)',
+        letterSpacing: 4,
         fontWeight: '600',
     },
+    form: {
+        gap: 30,
+    },
+    errorContainer: {
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ff6b6b',
+    },
+    errorText: {
+        color: '#ff6b6b',
+        fontSize: 12,
+        fontWeight: '700',
+        textAlign: 'center',
+        letterSpacing: 1,
+    },
+    inputGroup: {
+        gap: 10,
+    },
+    label: {
+        fontSize: 10,
+        fontWeight: '800',
+        color: GoldColors.secondary,
+        letterSpacing: 2,
+    },
     input: {
-        borderWidth: 1.5,
-        borderRadius: 12,
-        padding: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255, 215, 0, 0.2)',
+        paddingVertical: 12,
         fontSize: 16,
+        color: '#fff',
+        letterSpacing: 1,
     },
     passwordContainer: {
         flexDirection: 'row',
         alignItems: 'center',
     },
-    passwordInput: {
-        flex: 1,
-        paddingRight: 50,
-    },
     eyeIcon: {
-        position: 'absolute',
-        right: 16,
-    },
-    fieldError: {
-        color: '#ef4444',
-        fontSize: 12,
+        padding: 10,
     },
     button: {
-        backgroundColor: '#0a7ea4',
-        borderRadius: 12,
-        padding: 18,
+        backgroundColor: GoldColors.primary,
+        padding: 20,
         alignItems: 'center',
-        marginTop: 12,
+        marginTop: 20,
+        shadowColor: GoldColors.primary,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.5,
+        shadowRadius: 20,
+        elevation: 10,
     },
     buttonDisabled: {
-        opacity: 0.7,
+        opacity: 0.5,
     },
     buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '600',
+        color: '#000',
+        fontSize: 14,
+        fontWeight: '900',
+        letterSpacing: 2,
     },
     footer: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginTop: 24,
+        marginTop: 40,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255, 255, 255, 0.05)',
+        paddingTop: 30,
     },
     footerText: {
-        opacity: 0.7,
+        color: 'rgba(255, 255, 255, 0.3)',
+        fontSize: 10,
+        letterSpacing: 1,
     },
     linkText: {
-        fontWeight: '600',
+        color: GoldColors.primary,
+        fontWeight: '800',
+        fontSize: 10,
+        letterSpacing: 1,
     },
 });

@@ -1,12 +1,24 @@
 /**
  * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+const tintColorLight = '#D4AF37'; // Antique Gold
+const tintColorDark = '#FFD700';  // Gold
+
+export const GoldColors = {
+  primary: '#FFD700',      // Pure Gold
+  secondary: '#C5A021',    // Burnished Gold
+  accent: '#FF8C00',       // Dark Orange Gold
+  dark: '#030303',         // Deep Onyx
+  light: '#FDFCFB',        // Soft Pearl
+  glass: 'rgba(255, 255, 255, 0.03)',
+  glassBorder: 'rgba(255, 255, 255, 0.08)',
+  champagne: '#F9E79F',
+  bronze: '#CD7F32',
+  shadow: 'rgba(197, 160, 33, 0.2)',
+};
 
 export const Colors = {
   light: {
@@ -16,27 +28,27 @@ export const Colors = {
     icon: '#687076',
     tabIconDefault: '#687076',
     tabIconSelected: tintColorLight,
+    card: '#f9f9f9',
+    border: '#e1e1e1',
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: '#FFFFFF',
+    background: '#000000',
+    tint: GoldColors.primary,
+    icon: '#8E8E93',
+    tabIconDefault: '#8E8E93',
+    tabIconSelected: GoldColors.primary,
+    card: '#0A0A0A',
+    border: 'rgba(255, 215, 0, 0.1)',
   },
 };
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
+    sans: 'System',
+    serif: 'Georgia',
+    rounded: 'System',
+    mono: 'Courier',
   },
   default: {
     sans: 'normal',
